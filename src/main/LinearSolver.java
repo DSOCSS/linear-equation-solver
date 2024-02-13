@@ -1,5 +1,6 @@
 package main;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -165,8 +166,9 @@ public class LinearSolver {
         ArrayList<ArrayList<Double>> matrix = new ArrayList<ArrayList<Double>>();
 
         System.out.println("Welcome! Keep typing in equations, then type 'END' when you are done.\n" +
-                "You can also include a '-l' tag to log each row operation.");
+                "When typing 'END', you can also include a '-l' tag to log each row operation.");
         Scanner input = new Scanner(System.in);
+        int columnSize = -1;
         String in = input.nextLine();
         // repeatedly get user input until user types "END"
         while (!in.startsWith("END")) {
@@ -175,7 +177,13 @@ public class LinearSolver {
                 // convert the input into numbers, add to matrix
                 ArrayList<Double> numberRow = new ArrayList<>();
                 for (String elem : inputRow) numberRow.add(Double.parseDouble(elem));
-                matrix.add(numberRow);
+
+                if(columnSize == -1) columnSize = numberRow.size(); //update # columns in matrix
+                if (numberRow.size() != columnSize) throw new IOException("Wrong number of columns");
+
+                matrix.add(numberRow); // add valid row to matrix
+            } catch (IOException e){
+                System.out.println("Each row of your matrix needs to be size " + columnSize + " (# of items in first row)");
             } catch (Exception e) {
                 System.out.println("Please input numbers, separated with spaces");
             }
@@ -184,11 +192,12 @@ public class LinearSolver {
         System.out.println("\nOriginal Matrix:");
         printMatrix(matrix);
 
-        System.out.println("\nSimplified Matrix:");
         LinearSolver solver = new LinearSolver();
         if (in.contains("-l")) solver.enableLogging();
+        if (in.contains("-l")) System.out.println();
         solver.solveMatrix(matrix);
 
+        System.out.println("\nSimplified Matrix:");
         printMatrix(matrix);
         input.close();
     }
