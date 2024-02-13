@@ -158,6 +158,28 @@ public class LinearSolver {
         }
     }
 
+    /***
+    @michaudhary
+    */
+    public static boolean existsSolution(ArrayList<ArrayList<Double>> matrix) {
+        int C = matrix.get(0).size();
+        int R = matrix.size();
+        boolean solutionRow;
+
+        for (int r = 0; r < R; r++){
+            if (matrix.get(r).get(C - 1) != 0) {
+                solutionRow = false;
+                for (int c = 0; c < C - 1; c++) {
+                    if (matrix.get(r).get(c) != 0) {
+                        solutionRow = true;
+                    }
+                }
+                if (!solutionRow) return false;
+            }
+        }
+        return true;
+    }
+
     /**
      * Main method gathers user input and solves the given system of linear equations
      */
