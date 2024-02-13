@@ -55,6 +55,25 @@ class LinearSolverTest {
         solver.solveMatrix(matrix);
         assertEquals(RREFmatrix, matrix);
     }
+
+    @Test
+    void isSolution() {
+        //matrix with solution
+        ArrayList<ArrayList<Double>> testMatrix1 = new ArrayList<>();
+        testMatrix1.add(new ArrayList<>(List.of(3.0, -7.0, 4.0, 10.0)));
+        testMatrix1.add(new ArrayList<>(List.of(0.0, 0.0, 1.0, 3.0)));
+        testMatrix1.add(new ArrayList<>(List.of(2.0, -1.0, 2.0, 6.0)));
+
+        //matrix without solution
+        ArrayList<ArrayList<Double>> testMatrix2 = new ArrayList<>();
+        testMatrix2.add(new ArrayList<>(List.of(1.0, 0.0, 0.0, 2.0)));
+        testMatrix2.add(new ArrayList<>(List.of(0.0, 0.0, 0.0, 3.0)));
+        testMatrix2.add(new ArrayList<>(List.of(0.0, 0.0, 1.0, 1.0)));
+
+        //test
+        assertEquals(true, LinearSolver.existsSolution(testMatrix1));
+        assertEquals(false, LinearSolver.existsSolution(testMatrix2));
+    }
     /**
      *
      * 2 -2 -3 0 -2
