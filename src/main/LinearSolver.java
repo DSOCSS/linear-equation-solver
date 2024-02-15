@@ -58,7 +58,7 @@ public class LinearSolver {
      * @param c         scalar multiple of row_delta
      *                  row_i -> row_i + (c * row_delta)
      */
-    private void addRows(ArrayList<ArrayList<Double>> matrix, int row_i, int row_delta, double c) {
+    public void addRows(ArrayList<ArrayList<Double>> matrix, int row_i, int row_delta, double c) {
         for (int i = 0; i < matrix.get(row_i).size(); i++) {
             Double ogValue = matrix.get(row_i).get(i);
             Double addedValue = c * matrix.get(row_delta).get(i);

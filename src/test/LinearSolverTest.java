@@ -16,6 +16,10 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class LinearSolverTest {
 
+    /**
+     * Test cases for elementary row operations
+     * */
+
     @Test
     void swapTwoRows(){
         //original matrix
@@ -33,6 +37,50 @@ class LinearSolverTest {
         // swap rows with logging disabled
         LinearSolver solver = new LinearSolver();
         solver.swapRows(matrix, 0,1);
+        assertEquals(finalMatrix, matrix);
+    }
+
+    @Test
+    void scaleRowByConstant(){
+        //original matrix
+        ArrayList<ArrayList<Double>> matrix = new ArrayList<>();
+        matrix.add(new ArrayList<>(List.of(1.0, 2.0, 3.0)));
+        matrix.add(new ArrayList<>(List.of(4.0, 5.0, 6.0)));
+        matrix.add(new ArrayList<>(List.of(7.0, 8.0, 9.0)));
+
+        //intended matrix ofter scaling row 1 by 2
+        ArrayList<ArrayList<Double>> finalMatrix = new ArrayList<>();
+        finalMatrix.add(new ArrayList<>(List.of(1.0, 2.0, 3.0)));
+        finalMatrix.add(new ArrayList<>(List.of(8.0, 10.0, 12.0)));
+        finalMatrix.add(new ArrayList<>(List.of(7.0, 8.0, 9.0)));
+
+        // scale row 1 by 2 with logging disabled
+        LinearSolver solver = new LinearSolver();
+        try {
+            solver.scaleRow(matrix, 1, 2);
+        } catch(Exception e){
+            e.printStackTrace();
+        }
+        assertEquals(finalMatrix, matrix);
+    }
+
+    @Test
+    void addMultipleOfOneRowToAnother(){
+        //original matrix
+        ArrayList<ArrayList<Double>> matrix = new ArrayList<>();
+        matrix.add(new ArrayList<>(List.of(1.0, 2.0, 3.0)));
+        matrix.add(new ArrayList<>(List.of(4.0, 5.0, 6.0)));
+        matrix.add(new ArrayList<>(List.of(7.0, 8.0, 9.0)));
+
+        //intended matrix after adding 3 * row 1 to row 2
+        ArrayList<ArrayList<Double>> finalMatrix = new ArrayList<>();
+        finalMatrix.add(new ArrayList<>(List.of(1.0, 2.0, 3.0)));
+        finalMatrix.add(new ArrayList<>(List.of(4.0, 5.0, 6.0)));
+        finalMatrix.add(new ArrayList<>(List.of(19.0, 23.0, 27.0)));
+
+        // swap rows with logging disabled
+        LinearSolver solver = new LinearSolver();
+        solver.addRows(matrix, 2,1,3);
         assertEquals(finalMatrix, matrix);
     }
 
@@ -74,11 +122,4 @@ class LinearSolverTest {
         assertEquals(true, LinearSolver.existsSolution(testMatrix1));
         assertEquals(false, LinearSolver.existsSolution(testMatrix2));
     }
-    /**
-     *
-     * 2 -2 -3 0 -2
-     * 3 -3 -2 5 7
-     * 1 -1 -2 -1 3
-     * infinite results
-     */
 }
