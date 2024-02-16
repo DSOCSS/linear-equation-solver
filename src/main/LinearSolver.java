@@ -159,9 +159,6 @@ public class LinearSolver {
         }
     }
 
-    /***
-    @michaudhary
-    */
     public static boolean existsSolution(ArrayList<ArrayList<Double>> matrix) {
         int C = matrix.get(0).size();
         int R = matrix.size();
@@ -180,6 +177,7 @@ public class LinearSolver {
         }
         return true;
     }
+
     public static Double calcDeterminant (ArrayList<ArrayList<Double>> matrix){
         int n = matrix.size();
         //base case
@@ -247,6 +245,7 @@ public class LinearSolver {
         }
         return inverted;
     }
+
     /**
      * Main method gathers user input and solves the given system of linear equations
      */
