@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * JUnit 5 test cases for LinearSolver
@@ -119,7 +120,26 @@ class LinearSolverTest {
         testMatrix2.add(new ArrayList<>(List.of(0.0, 0.0, 1.0, 1.0)));
 
         //test
-        assertEquals(true, LinearSolver.existsSolution(testMatrix1));
-        assertEquals(false, LinearSolver.existsSolution(testMatrix2));
+        assertTrue(LinearSolver.existsSolution(testMatrix1));
+        assertFalse(LinearSolver.existsSolution(testMatrix2));
+    }
+
+    @Test
+    void calculateVectorSpaceSolution(){
+        // original matrix
+        ArrayList<ArrayList<Double>> matrix = new ArrayList<>();
+        matrix.add(new ArrayList<>(List.of(1.0, 2.0, 2.0, 2.0, 1.0)));
+        matrix.add(new ArrayList<>(List.of(2.0, 4.0, 6.0, 8.0, 5.0)));
+        matrix.add(new ArrayList<>(List.of(3.0, 6.0, 8.0, 10.0, 6.0)));
+
+        // solution space
+        ArrayList<ArrayList<Double>> solutionSpace = new ArrayList<>();
+        solutionSpace.add(new ArrayList<>(List.of(-2.0, 0.0, 1.5, 0.0)));
+        solutionSpace.add(new ArrayList<>(List.of(-2.0, 1.0, 0.0, 0.0)));
+        solutionSpace.add(new ArrayList<>(List.of(2.0, 0.0, -2.0, 1.0)));
+
+        LinearSolver solver = new LinearSolver();
+        solver.solveMatrix(matrix);
+        assertEquals(solutionSpace, LinearSolver.findSolutionSpace(matrix));
     }
 }
