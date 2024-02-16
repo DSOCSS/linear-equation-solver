@@ -3,6 +3,7 @@ package test;
 import main.LinearSolver;
 import org.junit.jupiter.api.Test;
 
+import java.security.spec.ECField;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -73,6 +74,34 @@ class LinearSolverTest {
         //test
         assertEquals(true, LinearSolver.existsSolution(testMatrix1));
         assertEquals(false, LinearSolver.existsSolution(testMatrix2));
+    }
+
+    @Test
+    void determinant() {
+        //matrix
+        ArrayList<ArrayList<Double>> testMatrix = new ArrayList<>();
+        testMatrix.add(new ArrayList<>(List.of(2.0, 3.0, 7.0, 2.0)));
+        testMatrix.add(new ArrayList<>(List.of(4.0, 8.0, 9.0, -5.0)));
+        testMatrix.add(new ArrayList<>(List.of(1.0, 6.0, 3.0, -8.0)));
+        testMatrix.add(new ArrayList<>(List.of(-7.0, -6.0, 3.0, 4.0)));
+
+        //test
+        assertEquals(-400.0, LinearSolver.calcDeterminant(testMatrix));
+    }
+
+    @Test
+    void inverse() {
+        //test matrix
+        ArrayList<ArrayList<Double>> testMatrix = new ArrayList<>();
+        testMatrix.add(new ArrayList<>(List.of(4.0, 3.0)));
+        testMatrix.add(new ArrayList<>(List.of(2.0, 1.0)));
+        //expected result matrix
+        ArrayList<ArrayList<Double>> resultMatrix = new ArrayList<>();
+        resultMatrix.add(new ArrayList<>(List.of(-0.5, 1.5)));
+        resultMatrix.add(new ArrayList<>(List.of(1.0, -2.0)));
+        //test
+        LinearSolver env = new LinearSolver();
+        assertEquals(resultMatrix, LinearSolver.invertMatrix(testMatrix));
     }
     /**
      *

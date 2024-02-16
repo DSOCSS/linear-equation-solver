@@ -1,6 +1,7 @@
 package main;
 
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -179,7 +180,73 @@ public class LinearSolver {
         }
         return true;
     }
+    public static Double calcDeterminant (ArrayList<ArrayList<Double>> matrix){
+        int n = matrix.size();
+        //base case
+        if (n == 1){
+            return matrix.get(0).get(0);
+        }
+        double total = 0.0;
+        for (int i = 0; i < n; i++) {
+            ArrayList<ArrayList<Double>> sub = new ArrayList<>();
+            //creates appropriate submatrix
+            for (int r = 1; r < n; r++) {
+                ArrayList<Double> row = new ArrayList<>();
+                for (int c = 0; c < n; c++) {
+                    if (c != i) {
+                        row.add(matrix.get(r).get(c));
+                    }
+                }
+                sub.add((ArrayList) row.clone());
+            }
+            //recursively calculates determinant
+            if (i % 2 == 0) {
+                total += matrix.get(0).get(i) * calcDeterminant(sub);
+            }
+            else{
+                total -= matrix.get(0).get(i) * calcDeterminant(sub);
+            }
+        }
+        return total;
+    }
 
+    public static boolean existsInversion (ArrayList<ArrayList<Double>> matrix){
+        return calcDeterminant(matrix) != 0.0;
+    }
+
+    public static ArrayList<ArrayList<Double>> invertMatrix (ArrayList<ArrayList<Double>> matrix){
+        int n = matrix.size();
+        LinearSolver rref = new LinearSolver();
+        ArrayList<ArrayList<Double>> inverted = new ArrayList<>();
+        //creates augmented matrix
+        for (int r = 0; r < n; r++) {
+            for (int c = 0; c < n; c++) {
+                if (r == c) {
+                    matrix.get(r).add(1.0);
+                }
+                else {
+                    matrix.get(r).add(0.0);
+                }
+            }
+        }
+        try{
+            //convert to rref
+            rref.convertToRowEchelon(matrix);
+            rref.convertToReducedRowEchelon(matrix);
+            //separates the second half of the rref matrix
+            for (int i = 0; i < n; i++){
+                ArrayList<Double> row = new ArrayList<>();
+                for (int j = n; j < 2 * n; j++){
+                    row.add(matrix.get(i).get(j));
+                }
+                inverted.add((ArrayList) row.clone());
+            }
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+        return inverted;
+    }
     /**
      * Main method gathers user input and solves the given system of linear equations
      */
