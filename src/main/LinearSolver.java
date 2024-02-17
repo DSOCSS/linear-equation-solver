@@ -59,7 +59,7 @@ public class LinearSolver {
      * @param c         scalar multiple of row_delta
      *                  row_i -> row_i + (c * row_delta)
      */
-    private void addRows(ArrayList<ArrayList<Double>> matrix, int row_i, int row_delta, double c) {
+    public void addRows(ArrayList<ArrayList<Double>> matrix, int row_i, int row_delta, double c) {
         for (int i = 0; i < matrix.get(row_i).size(); i++) {
             Double ogValue = matrix.get(row_i).get(i);
             Double addedValue = c * matrix.get(row_delta).get(i);
@@ -129,7 +129,10 @@ public class LinearSolver {
         }
     }
 
-    public void convertToReducedRowEchelon(ArrayList<ArrayList<Double>> matrix) throws Exception {
+    /**
+     * @param matrix a matrix in row echelon form
+     */
+    public void convertToReducedRowEchelon(ArrayList<ArrayList<Double>> matrix) {
         //begin at last row, back substitution
         for (int pivotRow = matrix.size() - 1; pivotRow >= 0; pivotRow--) {
             //find pivot column
@@ -159,12 +162,16 @@ public class LinearSolver {
         }
     }
 
+    /***
+     @michaudhary
+     */
+  
     public static boolean existsSolution(ArrayList<ArrayList<Double>> matrix) {
         int C = matrix.get(0).size();
         int R = matrix.size();
         boolean solutionRow;
 
-        for (int r = 0; r < R; r++){
+        for (int r = 0; r < R; r++) {
             if (matrix.get(r).get(C - 1) != 0) {
                 solutionRow = false;
                 for (int c = 0; c < C - 1; c++) {
@@ -247,6 +254,73 @@ public class LinearSolver {
     }
 
     /**
+     * Find the solution space to a matrix in reduced row echelon form that has at least one solution
+     *
+     * @return a two-dimensional ArrayList. First entry is a solution vector obtained by setting all free variables to zero,
+     * subsequent entries are linearly independent vectors in the null space, each obtained by having a different free variable set to one.
+     */
+    public static ArrayList<ArrayList<Double>> findSolutionSpace(ArrayList<ArrayList<Double>> RREFmatrix) {
+        final int NumCols = RREFmatrix.get(0).size();
+        ArrayList<Integer> pivotCols = new ArrayList<>();
+        ArrayList<Integer> freeCols = new ArrayList<>();
+
+        // find initial solution by setting all free variables to zero
+        ArrayList<Double> baseSolution = new ArrayList<>();
+        int row = 0;
+        boolean lastRow = false;
+        for (int col = 0; col < NumCols - 1; col++) {
+            if (RREFmatrix.get(row).get(col) == 1 && !lastRow) {
+                // pivot variable's value = constant
+                baseSolution.add(RREFmatrix.get(row).get(NumCols - 1));
+                pivotCols.add(col); // record location
+                if (row < RREFmatrix.size() - 1) {
+                    row++; // move onto next row
+                } else {
+                    lastRow = true; // there is no other pivot in this row
+                }
+            } else {
+                // free variable's value = 0
+                baseSolution.add(0.0);
+                freeCols.add(col); // record location
+            }
+        }
+        ArrayList<ArrayList<Double>> solutionSpace = new ArrayList<>(List.of(baseSolution));
+
+        // calculate null space
+        for (final int freeVarCol : freeCols) {
+            // initialize solution with all zero values
+            ArrayList<Double> solution = new ArrayList<>();
+            for (int i = 0; i < NumCols - 1; i++) solution.add(0.0);
+            solution.set(freeVarCol, 1.0); // one free variable is 1, others are 0
+
+            for (int r = 0; r < pivotCols.size(); r++) {
+                // pivot + free variable = 0
+                double varI = RREFmatrix.get(r).get(freeVarCol);
+                double pivotValue = -varI;
+                if (pivotValue == -0.0) pivotValue = 0.0;
+
+                solution.set(pivotCols.get(r), pivotValue); // update pivot value
+            }
+            // add null space vector to solution space
+            solutionSpace.add(solution);
+        }
+        return solutionSpace;
+    }
+
+    private static void printSolutionSpace(ArrayList<ArrayList<Double>> solutionSpace) {
+        System.out.println(solutionSpace.get(0));
+        String scalarStr = "";
+        for (int i = 1; i < solutionSpace.size(); i++) {
+            char c = (char) (96 + i); // get lowercase letter
+            scalarStr += c + ", ";
+            System.out.println("+ " + c + solutionSpace.get(i));
+        }
+        if (solutionSpace.size() > 1) {
+            System.out.println("For any scalars " + scalarStr.substring(0, scalarStr.length() - 2));
+        }
+    }
+
+    /**
      * Main method gathers user input and solves the given system of linear equations
      */
     public static void main(String[] args) {
@@ -266,11 +340,11 @@ public class LinearSolver {
                 ArrayList<Double> numberRow = new ArrayList<>();
                 for (String elem : inputRow) numberRow.add(Double.parseDouble(elem));
 
-                if(columnSize == -1) columnSize = numberRow.size(); //update # columns in matrix
+                if (columnSize == -1) columnSize = numberRow.size(); //update # columns in matrix
                 if (numberRow.size() != columnSize) throw new IOException("Wrong number of columns");
 
                 matrix.add(numberRow); // add valid row to matrix
-            } catch (IOException e){
+            } catch (IOException e) {
                 System.out.println("Each row of your matrix needs to be size " + columnSize + " (# of items in first row)");
             } catch (Exception e) {
                 System.out.println("Please input numbers, separated with spaces");
@@ -287,6 +361,14 @@ public class LinearSolver {
 
         System.out.println("\nSimplified Matrix:");
         printMatrix(matrix);
+
+        if (existsSolution(matrix)) {
+            System.out.println("There exists a solution to the matrix:");
+            printSolutionSpace(findSolutionSpace(matrix));
+        } else {
+            System.out.println("There is no solution for this system of linear equations.");
+        }
+
         input.close();
     }
 }
