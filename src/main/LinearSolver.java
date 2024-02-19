@@ -8,6 +8,7 @@ import java.util.Scanner;
 
 /**
  * @author Arthur Zarins
+ * @author Muneeb Chaudhary
  */
 public class LinearSolver {
     // when logOperations is true, all elementary row operations are logged
@@ -72,13 +73,19 @@ public class LinearSolver {
     }
 
     private static void printMatrix(ArrayList<ArrayList<Double>> matrix) {
+        printMatrix(matrix, true); //include the bar by default
+    }
+
+    private static void printMatrix(ArrayList<ArrayList<Double>> matrix, boolean includeBar) {
         for (ArrayList<Double> row : matrix) {
             System.out.print("[");
             for (int i = 0; i < row.size(); i++) {
                 System.out.print(row.get(i) + " \t");
-                // add line between variables and constants
-                if (i == row.size() - 2)
-                    System.out.print("| ");
+                if (includeBar) {
+                    // add line between variables and constants
+                    if (i == row.size() - 2)
+                        System.out.print("| ");
+                }
             }
             System.out.println("]");
         }
@@ -165,7 +172,7 @@ public class LinearSolver {
     /***
      @michaudhary
      */
-  
+
     public static boolean existsSolution(ArrayList<ArrayList<Double>> matrix) {
         int C = matrix.get(0).size();
         int R = matrix.size();
@@ -185,10 +192,10 @@ public class LinearSolver {
         return true;
     }
 
-    public static Double calcDeterminant (ArrayList<ArrayList<Double>> matrix){
+    public static Double calcDeterminant(ArrayList<ArrayList<Double>> matrix) {
         int n = matrix.size();
         //base case
-        if (n == 1){
+        if (n == 1) {
             return matrix.get(0).get(0);
         }
         double total = 0.0;
@@ -207,19 +214,18 @@ public class LinearSolver {
             //recursively calculates determinant
             if (i % 2 == 0) {
                 total += matrix.get(0).get(i) * calcDeterminant(sub);
-            }
-            else{
+            } else {
                 total -= matrix.get(0).get(i) * calcDeterminant(sub);
             }
         }
         return total;
     }
 
-    public static boolean existsInversion (ArrayList<ArrayList<Double>> matrix){
+    public static boolean existsInversion(ArrayList<ArrayList<Double>> matrix) {
         return calcDeterminant(matrix) != 0.0;
     }
 
-    public static ArrayList<ArrayList<Double>> invertMatrix (ArrayList<ArrayList<Double>> matrix){
+    public static ArrayList<ArrayList<Double>> invertMatrix(ArrayList<ArrayList<Double>> matrix) {
         int n = matrix.size();
         LinearSolver rref = new LinearSolver();
         ArrayList<ArrayList<Double>> inverted = new ArrayList<>();
@@ -228,29 +234,39 @@ public class LinearSolver {
             for (int c = 0; c < n; c++) {
                 if (r == c) {
                     matrix.get(r).add(1.0);
-                }
-                else {
+                } else {
                     matrix.get(r).add(0.0);
                 }
             }
         }
-        try{
+        try {
             //convert to rref
             rref.convertToRowEchelon(matrix);
             rref.convertToReducedRowEchelon(matrix);
             //separates the second half of the rref matrix
-            for (int i = 0; i < n; i++){
+            for (int i = 0; i < n; i++) {
                 ArrayList<Double> row = new ArrayList<>();
-                for (int j = n; j < 2 * n; j++){
+                for (int j = n; j < 2 * n; j++) {
                     row.add(matrix.get(i).get(j));
                 }
                 inverted.add((ArrayList) row.clone());
             }
-        }
-        catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return inverted;
+    }
+
+    /**
+     * Create a deep copy of a matrix
+     */
+    public static ArrayList<ArrayList<Double>> deepCopy(ArrayList<ArrayList<Double>> matrix) {
+        ArrayList<ArrayList<Double>> copyMatrix = new ArrayList<>();
+        for (int row = 0; row < matrix.size(); row++) {
+            ArrayList<Double> newRow = new ArrayList<>(matrix.get(row));
+            copyMatrix.add(newRow); //add new row to resulting matrix
+        }
+        return copyMatrix;
     }
 
     /**
@@ -351,14 +367,19 @@ public class LinearSolver {
             }
             in = input.nextLine();
         }
+
+        //print original matrix
         System.out.println("\nOriginal Matrix:");
         printMatrix(matrix);
+        //save original matrix for later
+        ArrayList<ArrayList<Double>> originalMatrix = deepCopy(matrix);
 
         LinearSolver solver = new LinearSolver();
         if (in.contains("-l")) solver.enableLogging();
         if (in.contains("-l")) System.out.println();
         solver.solveMatrix(matrix);
 
+        // print simplified matrix
         System.out.println("\nSimplified Matrix:");
         printMatrix(matrix);
 
@@ -367,6 +388,20 @@ public class LinearSolver {
             printSolutionSpace(findSolutionSpace(matrix));
         } else {
             System.out.println("There is no solution for this system of linear equations.");
+        }
+
+        if (originalMatrix.size() == originalMatrix.get(0).size()) {
+            double determinant = calcDeterminant(originalMatrix);
+            System.out.println("The matrix is square, it's determinant is " + determinant);
+            if (determinant != 0) {
+                //invert the original matrix
+                ArrayList<ArrayList<Double>> inverted = invertMatrix(originalMatrix);
+                roundMatrix(inverted);
+                System.out.println("The matrix is invertible. Inverse matrix:");
+                printMatrix(inverted, false);
+            } else {
+                System.out.println("The matrix is not invertible");
+            }
         }
 
         input.close();

@@ -14,6 +14,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  * JUnit 5 test cases for LinearSolver
  *
  * @author Arthur Zarins
+ * @author Muneeb Chaudhary
  * */
 
 class LinearSolverTest {
